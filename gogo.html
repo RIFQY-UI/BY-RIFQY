@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spin Diamond MLBB</title>
+<style>
+  body {
+    font-family: sans-serif;
+    text-align: center;
+    background: white;
+    margin: 0;
+    padding: 20px;
+  }
+  .ticket-box {
+    background: #eee;
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 15px;
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  .legend {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    margin-bottom: 10px;
+  }
+  .legend div {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .color-box {
+    width: 20px;
+    height: 20px;
+  }
+  .arrow {
+    width: 0;
+    height: 0;
+    margin: 10px auto;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-bottom: 25px solid blue;
+  }
+  .wheel-container {
+    position: relative;
+    width: 250px;
+    height: 250px;
+    margin: 0 auto;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 4px solid black;
+  }
+  .sector {
+    position: absolute;
+    width: 50%;
+    height: 50%;
+    top: 50%;
+    left: 50%;
+    transform-origin: 0% 0%;
+    clip-path: polygon(0% 0%, 100% 0%, 0% 100%);
+  }
+  #wheel.spinning {
+    animation: spin 3s ease-out;
+  }
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(1440deg); } /* 4 putaran */
+  }
+  button {
+    background: blue;
+    color: white;
+    border: none;
+    padding: 10px 30px;
+    border-radius: 10px;
+    font-size: 18px;
+    margin: 20px;
+  }
+  .reward-box {
+    border: 2px solid black;
+    border-radius: 15px;
+    display: inline-block;
+    padding: 10px 20px;
+    text-align: left;
+  }
+  .reward-box img {
+    width: 80px;
+    vertical-align: middle;
+  }
+  .reward-info {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 10px;
+  }
+</style>
+</head>
+<body>
+  <div class="ticket-box">
+    🎫 <span id="tickets">0</span>
+  </div>
+
+  <div class="legend">
+    <div><div class="color-box" style="background:brown;"></div> <span>ZONK 99%</span></div>
+    <div><div class="color-box" style="background:green;"></div> <span>+1 TIKET 1%</span></div>
+  </div>
+
+  <div class="arrow"></div>
+  <div class="wheel-container" id="wheel">
+  </div>
+
+  <button id="spinBtn">Spin</button>
+
+  <div class="reward-box">
+    <img src="https://i.ibb.co.com/3y2QBdHz/New-Project-83-A436-F42.png" alt="diamond">
+    <div class="reward-info">
+      <b>5 DIAMOND MLBB</b><br>
+      harga: 🎫 1<br>
+      stok: <span id="stok">1</span><br>
+    </div>
+    <button id="tukarBtn">Tukar</button>
+  </div>
+
+<script type="module">
+  // ====== Firebase Setup ======
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+  import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAsg1WX6lmRGNAzJP5VsCi77ZDl9VhmmVI",
+    authDomain: "ticta-aa921.firebaseapp.com",
+    databaseURL: "https://ticta-aa921-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "ticta-aa921",
+    storageBucket: "ticta-aa921.appspot.com",
+    messagingSenderId: "182885633906",
+    appId: "1:182885633906:web:ce36293451af16e46e17eb",
+    measurementId: "G-F5LGBTGS5C"
+  };
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  const wheel = document.getElementById("wheel");
+  const spinBtn = document.getElementById("spinBtn");
+  const ticketsEl = document.getElementById("tickets");
+  const stokEl = document.getElementById("stok");
+  const tukarBtn = document.getElementById("tukarBtn");
+
+  // ====== Buat 8 sektor ======
+  const sectors = 8;
+  const degPerSector = 360 / sectors;
+  for (let i = 0; i < sectors; i++) {
+    const s = document.createElement("div");
+    s.className = "sector";
+    s.style.background = i === 0 ? "green" : "brown";
+    s.style.transform = `rotate(${i * degPerSector}deg) skewY(${90 - degPerSector}deg)`;
+    wheel.appendChild(s);
+  }
+
+  // ====== Spin button ======
+  let spinning = false;
+  spinBtn.onclick = async () => {
+    if (spinning) return;
+    spinning = true;
+    wheel.classList.add("spinning");
+    spinBtn.disabled = true;
+
+    // Animasi 3 detik
+    setTimeout(async () => {
+      wheel.classList.remove("spinning");
+      spinBtn.disabled = false;
+      spinning = false;
+
+      // Random hasil (1% menang)
+      const menang = Math.random() < 0.01;
+      if (menang) {
+        alert("🎉 Selamat! Kamu dapat 1 tiket!");
+        let t = parseInt(ticketsEl.innerText);
+        t += 1;
+        ticketsEl.innerText = t;
+        await set(ref(db, "player/tiket"), t);
+      } else {
+        alert("Zonk 😢");
+      }
+    }, 3000);
+  };
+
+  // ====== Tukar Button ======
+  tukarBtn.onclick = async () => {
+    let stok = parseInt(stokEl.innerText);
+    let t = parseInt(ticketsEl.innerText);
+    if (t < 1) return alert("Tiket kamu tidak cukup!");
+    if (stok < 1) return alert("Hadiah sudah habis!");
+
+    // Kurangi stok dan tiket
+    t -= 1; stok -= 1;
+    ticketsEl.innerText = t;
+    stokEl.innerText = stok;
+
+    await set(ref(db, "player/tiket"), t);
+    await set(ref(db, "reward/stok"), stok);
+
+    // Redirect ke WhatsApp
+    window.location.href = "https://wa.me/6283865566942?text=Halo%20Admin%2C%20saya%20menukarkan%205%20DIAMOND%20MLBB.";
+  };
+
+  // ====== Load data awal ======
+  async function loadData() {
+    const tiketSnap = await get(ref(db, "player/tiket"));
+    const stokSnap = await get(ref(db, "reward/stok"));
+    ticketsEl.innerText = tiketSnap.exists() ? tiketSnap.val() : 0;
+    stokEl.innerText = stokSnap.exists() ? stokSnap.val() : 1;
+  }
+  loadData();
+</script>
+</body>
+</html>
