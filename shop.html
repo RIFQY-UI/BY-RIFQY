@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Centang — Beli via WhatsApp</title>
+  <style>
+    :root{
+      --card-bg: #fff;
+      --border: #000;
+      --accent: #0b62ff;
+      --text: #000;
+      --muted: #4a4a4a;
+      font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    body{
+      background: #ffffff;
+      margin: 24px;
+      display: flex;
+      justify-content: center;
+      font-size: 16px;
+      color: var(--text);
+    }
+
+    .card{
+      width: 920px;           /* sesuaikan lebar */
+      max-width: 96%;
+      border: 4px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      box-sizing: border-box;
+      display:flex;
+      align-items:center;
+      gap: 18px;
+      background: var(--card-bg);
+    }
+
+    .thumb-wrap{
+      min-width: 120px;
+      min-height: 120px;
+      border: 3px solid var(--border);
+      border-radius: 16px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 8px;
+      box-sizing: border-box;
+      background: #fff;
+    }
+
+    .thumb-wrap img{
+      width: 84px;
+      height: 84px;
+      object-fit: contain;
+      display:block;
+    }
+
+    .meta{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .title{
+      font-weight:800;
+      font-size:34px;
+      letter-spacing:0.5px;
+    }
+
+    .price{
+      color:var(--muted);
+      font-weight:600;
+      font-size:18px;
+    }
+
+    .actions{
+      display:flex;
+      align-items:center;
+      gap:16px;
+      margin-top:6px;
+    }
+
+    .btn-buy{
+      background: linear-gradient(180deg, var(--accent), #0849d9);
+      border:none;
+      padding: 14px 48px;
+      color:#fff;
+      font-weight:800;
+      font-size:28px;
+      border-radius: 18px;
+      cursor:pointer;
+      box-shadow: 0 6px 0 rgba(0,0,0,0.12);
+    }
+
+    .btn-buy:active{
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 rgba(0,0,0,0.08);
+    }
+
+    /* responsive small screens */
+    @media (max-width:600px){
+      .card{ flex-direction:column; align-items:flex-start; gap:12px; padding:14px; }
+      .thumb-wrap{ min-width:80px; min-height:80px; }
+      .thumb-wrap img{ width:60px; height:60px; }
+      .title{ font-size:22px; }
+      .btn-buy{ font-size:20px; padding:10px 28px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card" role="region" aria-label="Produk Centang">
+    <div class="thumb-wrap" aria-hidden="true">
+      <img src="https://i.ibb.co.com/8gRYFcj2/New-Project-114-B74-D764.png" alt="Ikon centang">
+    </div>
+
+    <div class="meta">
+      <div class="title">CENTANG</div>
+      <div class="price">HARGA : Rp176.000</div>
+
+      <div class="actions">
+        <!-- tombol Beli -->
+        <button id="buyBtn" class="btn-buy" aria-label="Beli via WhatsApp">Beli</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Nomor WhatsApp: pastikan menggunakan format internasional tanpa + / tanda spasi
+    // Nomor yang diberikan: 083865566942 -> Indonesia country code 62 -> 6283865566942
+    const phoneNumber = "6283865566942";
+
+    // Pesan pra-isi (URI encoded)
+    const message = encodeURIComponent("Halo, saya ingin membeli CENTANG (Rp176.000). Mohon info selanjutnya.");
+
+    // URL WhatsApp (wa.me)
+    const waUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+
+    document.getElementById("buyBtn").addEventListener("click", function(){
+      // Buka WhatsApp (web/phone) di tab baru
+      window.open(waUrl, "_blank");
+    });
+
+    // Optional: jika pengguna menekan Enter saat tombol fokus -> juga kirim
+    document.getElementById("buyBtn").addEventListener("keyup", function(e){
+      if(e.key === "Enter" || e.key === " "){
+        this.click();
+      }
+    });
+  </script>
+</body>
+</html>
